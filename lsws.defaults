@@ -1,0 +1,15 @@
+#!/bin/sh
+
+# Defaul wallpapers' directory
+DIRECTORY="$HOME/Wallpapers/"
+
+# Default program to set background
+APP="hsetroot"
+APP_FLAG="-cover"
+
+# Exclude certain wallpapers
+IGNORE=""
+
+WALLPAPER_NAME_ADDR="$HOME/.local/share/lsws/logs/current_wallpaper.txt"
+WALLPAPER_LOGS="$HOME/.local/share/lsws/logs/wallpaper_logs.txt"
+WALLPAPERS_RESTORE_LOGS="$HOME/.local/share/lsws/logs/wallpaper_res_logs.txt"
