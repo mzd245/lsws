@@ -1,7 +1,6 @@
 #!/bin/sh
 directory="$HOME/Wallpapers/"
 #you should change value of directory variable.
-HOMEUSER="$HOME"
 app="hsetroot"
 app_flag="-cover"
 #you should change your tool with hsetroot. and you should use flag/operand of your tool for setting wallpaper.
