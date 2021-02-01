@@ -170,5 +170,5 @@ while [ true ];do
 	esac
 done
 if [ -z "$1" ];then
-	printf "run again wirh -h flag/operand.\n"
+	printf "run again withe -h flag/operand.\n"
 fi
