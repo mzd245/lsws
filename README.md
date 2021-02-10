@@ -4,7 +4,7 @@ a simple wrapper for setting wallpapers with wallpaper setters tools.
 1. sudo sh setup.sh
 # more info:
 `man 1 lsws` (after setup script)
-#the lsws.defaults file variables should be changed:
+# the lsws.defaults file variables should be changed:
 	1. DIRECTORY
 	2. APP
 	3. APP_FLAG
