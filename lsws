@@ -1,115 +1,76 @@
 #!/bin/sh
 # if you do not know shell scripting(sh, bash, ...) do not modify this script.
-make_directories() {
-	if  [ -e "$HOME/.local/share/lsws/" ];then
-		printf "\033[0;32m$HOME/.local/share/lsws/ existed!\n\033[0m"
-	else
-		mkdir -v "$HOME/.local/share/lsws/";mkdir -v "$HOME/.local/share/lsws/logs/"
-		printf "`date +%y/%m/%d-%H:%M:%S` directory $HOME/.local/share/lsws/ created!\n" > $HOME/.local/share/lsws/logs/logs.txt
-	fi
-	if [ -e "$HOME/.config/lsws/" ] && [ -e "$HOME/.config/lsws/lsws.defaults" ];then
-		printf "\033[0;32m$HOME/.config/lsws/ and $HOME/.config/lsws/lsws.defaults existed!\n\033[0m"
-	else
-		mkdir -v "$HOME/.config/lsws/";touch "$HOME/.config/lsws/lsws.defaults"
-		printf "`date +%y/%m/%d-%H:%M:%S` directory $HOME/.config/ created!\n" >> $HOME/.local/share/lsws/logs/logs.txt
-	fi;
-}
+
+#it is better to do not change the value of these variables.
+LSWS_DEFAULT_OPTIONS="$HOME/.lsws/config/lsws.defaults"
+WALLPAPER_NAME_ADDR="$HOME/.lsws/logs/current_wallpaper"
+WALLPAPER_LOGS="$HOME/.lsws/logs/wallpaper_logs"
+WALLPAPERS_RESTORE_LOGS="$HOME/.lsws/logs/wallpaper_res_logs"
 
 Restore(){
-	local Path="$HOME/.local/share/lsws/logs/wallpaper_res_logs.txt"
-	local output=`cat "${Path}" | tail -n 2 | head -n 1`
-	`$APP ${APP_FLAG} "${output}" >> /dev/null ` && printf "${output}\n" > "${WallpaperNameAddr}"
+	local OUTPUT=`cat "${WALLPAPERS_RESTORE_LOGS}" | tail -n 2 | head -n 1`
+	`$APP ${APP_FLAG} "${OUTPUT}" >> /dev/null ` && printf "${OUTPUT}\n" > "${WALLPAPER_NAME_ADDR}"
 }
 
 SecondRestore(){
-	local one="$1";local two="$2"
-	if [ "${one}" == "-p" ];then
-		local output=`awk -v n=$two '{saved[NR % n] = $0} END{if (NR >= n) print saved[(NR + 1) % n]}' < "${WallpapersRestoreLogs}"`
-		`$APP $APP_FLAG "${output}" > /dev/null ` && printf "${output}\n" > "${WallpaperNameAddr}"
-	elif [ "${one}" == "-n" ];then
-		local output=`cat "${WallpapersRestoreLogs}" | awk "NR==${two}"`
-		`$APP $APP_FLAG "${output}" > /dev/null ` && printf "${output}\n" > "${WallpaperNameAddr}"
+	local ONE="$1";local TWO="$2"
+	if [ "${ONE}" == "-p" ];then
+		local OUTPUT=`awk -v n=$TWO '{saved[NR % n] = $0} END{if (NR >= n) print saved[(NR + 1) % n]}' < "$WALLPAPERS_RESTORE_LOGS"`
+		`$APP $APP_FLAG "${OUTPUT}" > /dev/null ` && printf "${OUTPUT}\n" > "${WALLPAPER_NAME_ADDR}"
+		printf "\033[0;32m$OUTPUT\033[0m is the wallpaper.\n"
+	elif [ "${ONE}" == "-n" ];then
+		local OUTPUT=`cat "${WALLPAPERS_RESTORE_LOGS}" | awk "NR==$TWO {print }"`
+		`$APP $APP_FLAG "${OUTPUT}" > /dev/null ` && printf "${OUTPUT}\n" > "${WALLPAPER_NAME_ADDR}"
+		printf "\033[0;32m$OUTPUT\033[0m is the wallpaper.\n"
 	else
 		exit 1
 	fi
 }
 
 set_wallpaper(){
-	printf "directory var: $DIRECTORY\n"
-	if [ "${directory:-null}" == null ];then
-		#${directory:-null} means if directory variable did not set, set it to null.
-		printf "\033[0;31mexited\033[0m\033[0;4m(directory variable)\033[0m\n" && exit 1
+	printf "DIRECTORY var: $DIRECTORY\n"
+	if [ "${DIRECTORY:-null}" == null ];then
+		#${DIRECTORY:-null} means if DIRECTORY variable did not set, set it to null.
+		printf "\033[0;31mexited\033[0m\033[0;4m(DIRECTORY variable)\033[0m\n" && exit 1
 	elif [ "${IGNORE:-null}" == null ] && [ "${APP:-null}" != null ];then
 		printf "\033[0;32mpassed\033[0m\033[0;4m(IGNORE variable)\033[0m\n"
 	elif [ "${APP:-null}" == null ];then
 		printf "\033[0;31mexited\033[0m\033[0;4m(APP variable)\033[0m\n" && exit 1
 	fi
-	wallpapers_count=`ls $DIRECTORY | wc -l`
-	rand=`echo | awk 'srand() {printf("%d%d\n", (300 * rand()) * 2, (300 * rand()) * 2 )}'`
-	RAND_NUMBER=$( expr $rand % $wallpapers_count)
-	counter=0
+	local WALLPAPERS_COUNT=`ls $DIRECTORY | wc -l`
+	local RAND=`echo | awk 'srand() {printf("%d%d\n", (300 * rand()) * 2, (300 * rand()) * 2 )}'`
+	local RAND_NUMBER=$( expr $RAND % $WALLPAPERS_COUNT)
+	local COUNTER=0
 	IFS=$'\n'
-	for i in `ls ${directory}`;do
-		if [ "$counter" == "$RAND_NUMBER" ];then
-			if [ "${IGNORE:-null}" != null ] && [ ${IGNORE} =~ ${i} ];then
-				printf "\n`date +%y/%m/%d-%H:%M:%S` <<this wallpaper passed: \033[0;36m${i}\033[0m \033[0;4m(because you were set it to IGNORE variable)>>\033[0m\n" >> "$WallpapersLogs"
-				continue
+	for i in `ls ${DIRECTORY}`;do
+		if [ "$COUNTER" == "$RAND_NUMBER" ];then
+			local OUTPUT=`echo "$IGNORE" | grep -i "$i"`
+			if [ -n "$OUTPUT" ];then
+			printf "\n`date +%y/%m/%d-%H:%M:%S` <<this wallpaper passed: \033[0;36m${i}\033[0m \033[0;4m(because you were set it to IGNORE variable)>>\033[0m\n" >> "$WALLPAPER_LOGS"
+			printf "\033[0;32m\nwallpaper skipped: %s\n\033[0m" "$i"
+			continue
 			fi
+			printf "the \$IGNORE variable contents: ($IGNORE)\n"
 			printf "\nwallpaper: %s\n" "$i"
-			`$APP ${APP_FLAG} ${directory}${i} > "${WallpaperLogs}"`;printf "${directory}${i}" > "${WallpaperNameAddr}"
-			printf "${directory}${i}\n" >> "${WallpapersRestoreLogs}"
+			`$APP ${APP_FLAG} ${DIRECTORY}${i} >> "${WALLPAPER_LOGS}"`;printf "${DIRECTORY}${i}" > "${WALLPAPER_NAME_ADDR}"
+			printf "${DIRECTORY}${i}\n" >> "${WALLPAPERS_RESTORE_LOGS}"
 		fi
-		let counter+=1 > /dev/null
+		let COUNTER+=1 > /dev/null
 	done
 }
 
-set_wallpaper_with_time(){
-	printf "directory var: $DIRECTORY\n"
-	if [ "${directory:-null}" == null ];then
-		#${directory:-null} means if directory variable did not set, set it to null.
-		printf "\033[0;31mexited\033[0m\033[0;4m(directory variable)\033[0m\n" && exit 1
-	elif [ "${IGNORE:-null}" == null ] && [ "${APP:-null}" != null ];then
-		printf "\033[0;32mpassed\033[0m\033[0;4m(IGNORE variable)\033[0m\n"
-	elif [ "${APP:-null}" == null ];then
-		printf "\033[0;31mexited\033[0m\033[0;4m(APP variable)\033[0m\n" && exit 1
-	fi
-	wallpapers_count=`ls $DIRECTORY | wc -l`
-	wallpapers_count=`echo $wallpapers_count | sed "s/\ //g"`
-	rand=`echo | awk 'srand() {printf("%d%d\n", (300 * rand()) * 2, (300 * rand()) * 2 )}'`
-	RAND_NUMBER=`expr $rand % $wallpapers_count`
-	counter=0
-	IFS=$'\n'
-	for i in `ls ${directory}`;do
-		if [ "$counter" == "$RAND_NUMBER" ];then
-			if [ "${IGNORE:-null}" != null ] && [ ${IGNORE} =~ ${i} ];then
-				printf "\n`date +%y/%m/%d-%H:%M:%S` <<this wallpaper passed: \033[0;36m${i}\033[0m \033[0;4m(because you were set it to IGNORE variable)>>\033[0m\n" >> "$WallpapersLogs"
-				continue
-			fi
-			printf "\nwallpaper: %s\n" "$i"
-			`$APP $APP_FLAG  "${directory}${i}" >> $WallpaperLogs`;printf "\n${i}\n" > $WallpaperNameAddr
-			printf "${directory}${i}\n" >> "${WallpapersRestoreLogs}"
-		fi
-		let counter+=1 > /dev/null
-	done
-}
-
-TEMP=`getopt 'irwhp:n:lct:Ch' "$*"`
+TEMP=`getopt 'rwhp:n:lct:C' "$*"`
 if [ $? -ne 0 ];then
 	printf "\033[0;31mTerminating...\n\033[0m"
 	exit 1
 fi
-if [ -e "$HOME/.config/lsws/lsws.defaults" ];then
-	. "$HOME/.config/lsws/lsws.defaults"
+if [ -e "$LSWS_DEFAULT_OPTIONS" ];then
+	. "$LSWS_DEFAULT_OPTIONS"
 fi
 eval set -- "$TEMP"
 unset TEMP
 while [ true ];do
 	case "$1" in
-		'-i')
-			printf "starting...\n"
-			make_directories
-			break
-			;;
 		'-r')
 			Restore
 			break
@@ -119,44 +80,43 @@ while [ true ];do
 			break
 			;;
 		'-p')
-			number="$2"
-			arg="$1"
-			SecondRestore ${arg} ${number}
+			NUMBER="$2"
+			ARG="$1"
+			SecondRestore ${ARG} ${NUMBER}
 			break
 			;;
 		'-n')
-			number="$2"
-			arg="$1"
-			SecondRestore ${arg} ${number}
+			NUMBER="$2"
+			ARG="$1"
+			SecondRestore ${ARG} ${NUMBER}
 			break
 			;;
 		'-l')
-			output=`cat ${WallpapersRestoreLogs}`
-			printf "last set wallpapers: \n\033[5;31m${output}\n\033[0m"
+			OUTPUT=`cat ${WALLPAPERS_RESTORE_LOGS}`
+			printf "last set wallpapers: \n\033[5;31m${OUTPUT}\n\033[0m"
 			break
 			;;
 		'-c')
-			cat /dev/null > ${WallpapersRestoreLogs}
+			cat /dev/null > "${WALLPAPERS_RESTORE_LOGS}"
 			echo "done."
 			break
 			;;
 		'-t')
-			#the $2 args gets second number.
-			Time=`expr $2 \* 60`
+			TIME=`expr $2 \* 60`
 			while [ true ];do
-				set_wallpaper_with_time $Time
-				sleep $Time
+				set_wallpaper
+				sleep $TIME
 			done
 
 			break
 			;;
 		'-C')
-			output=`cat $WallpaperNameAddr`
-			printf "\033[0;31m${output}\033[0m\n"
+			OUTPUT=`cat $WALLPAPER_NAME_ADDR`
+			printf "\033[0;33m${OUTPUT}\033[0m\n"
 			break
 			;;
 		'-h')
-			printf "you can read the man page of lsws, you should move the lsws.1.gz to /usr/local/man/man1/lsws.1.gz\n"
+			printf "you can read the man page after run: \033[0;32msudo sh setup.sh\033[0m\nthe man page will be lsws(1).\n"
 			break
 			;;
 		'--')
@@ -170,5 +130,5 @@ while [ true ];do
 	esac
 done
 if [ -z "$1" ];then
-	printf "run again withe -h flag/operand.\n"
+	printf "run again with -h flag/operand.\n"
 fi

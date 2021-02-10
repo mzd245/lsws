@@ -1,0 +1,165 @@
+.Dd Feb 10, 2021
+.TH  lsws "1" "UserCommands"
+.SH NAME
+lsws \- a simple wrapper for setting wallpapers with wallpaper setters tools.
+.Sh OPTIONS
+\".Bl -tag -width indent
+.Pp
+.Op Fl r
+.Pp
+restore last wallpaper from $HOME/.lsws/logs/wallpaper_res_logs
+.Pp
+.Op Fl w
+.Pp
+set a random wallpaper.
+.Pp
+.Op Fl p
+.Op Ar number
+.Pp
+sets
+.Cm X
+wallpapaer from end of $HOME/.lsws/logs/wallpaper_res_logs file.
+.Pp
+.Op Fl n
+.Op Ar number
+.Pp
+sets
+.Cm X
+wallpapaer from begin of $HOME/.lsws/logs/wallpaper_res_logs file.
+.Pp
+.Op Fl l
+.Pp
+list of choosed wallpapaers.
+.Pp
+.Op Fl c
+.Pp
+clean $HOME/.lsws/logs/wallpaper_res_logs
+.Pp
+.Op Fl t
+.Op Ar number
+.Pp
+every
+.Cm X
+minutes change wallpaper.
+.Pp
+.Br
+.Sh DESCRIPTION
+.Nm
+.Cm lsws
+has a config/options file in $HOME/.lsws/config/lsws.defaults, and should set like this:
+.Bl -bullet -compact
+.
+.It
+APP="hsetroot"
+.
+.It
+APP_FLAG="-cover"
+.
+.It
+DIRECTORY="$HOME/Wallpapers/"
+.
+.It
+IGNORE="pictrue.jpg"
+.
+.El
+the
+.Cm APP
+variable should be set your wallpaper setter tool(you can use
+.Cm feh
+or ...).
+.Pp
+.
+the
+.Cm APP_FLAG
+variable should be set your wallpaper setter tool flag like
+.Pa hsetroot
+.Cm -cover
+.Pa one.jpg \.
+.
+.Pp
+.
+the
+.Cm DIRECTORY
+variable should be set with your wallpapers directory/address.
+.
+.Pp
+.
+the
+.Cm IGNORE
+variable is for passing a wallpaper, it means which wallpapaer name is in the
+.Cm IGNORE
+variable, does not set(separated with
+.Cm space
+).
+.
+.Pp
+.
+for example:
+.Bl -bullet -compact
+.
+.It
+IGNORE="one.jpg two.jpg"
+.
+.El
+the
+.Cm one.jpg
+and
+.Cm two.jpg
+does not set by script.
+.Pp
+.
+.Cm WALLPAPER_NAME_ADDR
+variable is for current wallpaper name.
+if run
+.Cm lsws -C
+prints the current wallpaper name(that use WALLPAPER_NAME_ADDR).
+.
+.Pp
+.
+.Cm WALLPAPER_LOGS
+variable is for the wallpaper logs when wallpapers choosed via wallpaper setter tool. for example send the output of
+.Pa hsetroot -cover one.jpg
+to
+.Cm WALLPAPER_LOGS.
+.
+.Pp
+.
+.Cm WALLPAPERS_RESTORE_LOGS
+variable is for the last choosed wallpapers(it's useful for
+.Cm -p
+or
+.Cm -n
+flag/operand).
+.
+.Pp
+.
+.Pp
+.
+.Sh EXAMPLES
+.
+.Pp
+.
+$ lsws -n 1
+.Pp
+$ lsws -t 3
+.Pp
+the
+.Cm first
+command will set first wallpaper begin of $HOME/.lsws/logs/wallpaper_res_logs
+.Pp
+the
+.Cm second
+command will change the wallpaper every 3 minutes.
+.
+.Pp
+.Sh NOTICE
+if you want to run
+.Cm lsws
+like other commands you can add
+.Cm lsws
+directory address to PATH variable, for example in bash shell:
+.Cm echo 'export PATH="/path/to/:$PATH"' >> ~/.bashrc
+.Pp
+the
+.Cm lsws
+script is in the /path/to/ directory(the lsws script need executable permission)\.
