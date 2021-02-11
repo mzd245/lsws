@@ -10,8 +10,8 @@ a simple wrapper for setting wallpapers with wallpaper setters tools.
 1. DIRECTORY
 2. APP
 3. APP_FLAG<br />
-**the <mark>DIRECTORY</mark> variable should be set with your wallpapers directory/folder.**<br />
-**the <mark>APP</mark> variable should be set your wallpaper setter tool.**<br />
-**the <mark>APP_FLAG</mark> is operand/flag of your wallpaper setter tool for setting wallpaper.**<br />
+- the <mark>DIRECTORY</mark> variable should be set with your wallpapers directory/folder.<br />
+- the <mark>APP</mark> variable should be set your wallpaper setter tool.<br />
+- the <mark>APP_FLAG</mark> is operand/flag of your wallpaper setter tool for setting wallpaper.<br />
 # more info:
 `man 1 lsws` (after setup script)
