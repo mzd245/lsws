@@ -1,10 +1,10 @@
 # lsws
 a simple wrapper for setting wallpapers with wallpaper setters tools.
-# lsws features:
+# Features:
 1. set wallpaper every X minutes.
 2. set X wallpaper from  begin/end of the history file.
 3. restore last wallpaper from histroy file.
-# setup lsws:
+# Installation:
 1. sudo sh setup.sh
 # the lsws.defaults file variables should be changed:
 	1. DIRECTORY
