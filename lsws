@@ -1,7 +1,5 @@
 #!/bin/sh
-# if you do not know shell scripting(sh, bash, ...) do not modify this script.
 
-#it is better to do not change the value of these variables.
 LSWS_DEFAULT_OPTIONS="$HOME/.lsws/config/lsws.defaults"
 WALLPAPER_NAME_ADDR="$HOME/.lsws/logs/current_wallpaper"
 WALLPAPER_LOGS="$HOME/.lsws/logs/wallpaper_logs"
@@ -30,7 +28,7 @@ SecondRestore(){
 set_wallpaper(){
 	printf "DIRECTORY var: $DIRECTORY\n"
 	if [ "${DIRECTORY:-null}" == null ];then
-		#${DIRECTORY:-null} means if DIRECTORY variable did not set, set it to null.
+		#${DIRECTORY:-null} means if DIRECTORY was undefined, set it to null.
 		printf "\033[0;31mexited\033[0m\033[0;4m(DIRECTORY variable)\033[0m\n" && exit 1
 	elif [ "${IGNORE:-null}" == null ] && [ "${APP:-null}" != null ];then
 		printf "\033[0;32mpassed\033[0m\033[0;4m(IGNORE variable)\033[0m\n"
@@ -116,7 +114,7 @@ while [ true ];do
 			break
 			;;
 		'-h')
-			printf "you can read the man page after run: \033[0;32msudo sh setup.sh\033[0m\nthe man page will be lsws(1).\n"
+                        printf "Usage: lsws OPTION\nRead lsws(1) for more information.\n"
 			break
 			;;
 		'--')
@@ -124,11 +122,11 @@ while [ true ];do
 			break
 			;;
 		*)
-			printf "Internal Error\n"
+			printf "Internal error.\n"
 			exit 1
 			;;
 	esac
 done
 if [ -z "$1" ];then
-	printf "run again with -h flag/operand.\n"
+	printf "lsws: missing operand\nTry 'lsws -h' for more information.\n"
 fi
